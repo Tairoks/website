@@ -5,7 +5,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{{ title }}</title>
     <link type="text/css" href="{% static 'women/css/styles.css' %}" rel="stylesheet" />
     <link rel="shortcut icon" href="{% static 'women/images/main.ico' %}" type="image/x-icon"/>
 </head>
@@ -15,13 +15,14 @@
 		<div class="header">
 			<ul id="mainmenu" class="mainmenu">
 			<li class="logo"><a href="{% url 'home' %}"><div class="logo"></div></a></li>
-	{% for m in menu %}
-		{% if not forloop.last %}
-				<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
-		{% else %}
-				<li class="last"><a href="{% url m.url_name %}">{{m.title}}</a></li>
-		{% endif %}
-	{% endfor %}
+		{% for m in menu %}
+			<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
+		{% endfor %}
+				{% if user.is_authenticated %}
+					<li class="last">{{ user.username }} | <a href="{% url 'logout' %}">Выйти</a></li>
+				{% else %}
+					<li class="last"><a href="{% url 'register' %}">Регистрация</a> | <a href="{% url 'login' %}">Войти</a></li>
+				{% endif %}
 			</ul>
 			<div class="clear"></div>
 		</div>
@@ -29,6 +30,7 @@
 
 <table class="table-content" border=0 cellpadding="0" cellspacing="0">
 <tr>
+
 	<td valign="top" class="left-chapters">
 
 	<ul id="leftchapters">
@@ -37,10 +39,16 @@
 		{% else %}
 			<li><a href="{% url 'home' %}">Все категории</a></li>
 		{% endif %}
+		{% for c in cats %}
+			{% if c.women__count > 0 %}
+				{% if c.pk == cat_selected %}
+					<li class="selected">{{ c.name }}</li>
+				{% else %}
+					<li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>
+				{% endif %}
+			{% endif %}
+		{% endfor %}
 
-		{% show_categories 'name' cat_selected %}
-
-			<li class="share"></li>
 	</ul>
 </td>
 
@@ -48,6 +56,36 @@
 
 {% block content %}
 {% endblock %}
+
+{% if page_obj.has_other_pages %}
+<nav class="list-pages">
+	<ul>
+
+		{% if page_obj.has_previous %}
+		<li class="page-num">
+			<a href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+		</li>
+		{% endif %}
+
+		{% for p in paginator.page_range %}
+		{% if page_obj.number == p %}
+		<li class="page-num page-num-selected">{{ p }}</li>
+		{% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+		<li class="page-num">
+			<a href="?page={{ p }}">{{ p }}</a>
+		</li>
+		{% endif %}
+		{% endfor %}
+
+		{% if page_obj.has_next %}
+		<li class="page-num">
+			<a href="?page={{ page_obj.next_page_number }}">&gt;</a>
+		</li>
+		{% endif %}
+
+	</ul>
+</nav>
+{% endif %}
 
 <tr><td valign=top>
 	<div id="footer">

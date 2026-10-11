@@ -1,0 +1,7 @@
+#header, .module caption {
+    background: #5e3a00;
+}
+
+.theme-toggle svg.theme-icon-when-auto, .theme-toggle svg.theme-icon-when-dark, .theme-toggle svg.theme-icon-when-light{
+    color: #5e3a00;
+}
